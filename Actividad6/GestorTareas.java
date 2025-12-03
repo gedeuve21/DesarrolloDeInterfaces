@@ -1,5 +1,6 @@
 package Actividad6;
 
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -7,7 +8,8 @@ import java.awt.event.*;
 public class GestorTareas extends JFrame {
 
     private JTextField campoTarea;
-    private JButton btnAgregar, btnEliminar;
+    private JButton btnAgregar, btnEliminarTodo;
+    private JButton btnBorrarSeleccionada; 
     private JList<String> listaTareas;
     private DefaultListModel<String> modeloLista;
     private JLabel lblEstado;
@@ -20,27 +22,39 @@ public class GestorTareas extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
+       
         JPanel panelSuperior = new JPanel();
         panelSuperior.setLayout(new FlowLayout());
 
         campoTarea = new JTextField(20);
         btnAgregar = new JButton("Agregar");
-        btnEliminar = new JButton("Eliminar");
+        btnEliminarTodo = new JButton("Eliminar Todo"); 
 
         panelSuperior.add(campoTarea);
         panelSuperior.add(btnAgregar);
-        panelSuperior.add(btnEliminar);
+        panelSuperior.add(btnEliminarTodo); 
 
         add(panelSuperior, BorderLayout.NORTH);
         
+       
         modeloLista = new DefaultListModel<>();
         listaTareas = new JList<>(modeloLista);
 
         add(new JScrollPane(listaTareas), BorderLayout.CENTER);
 
-        lblEstado = new JLabel(" ");
-        add(lblEstado, BorderLayout.SOUTH);
+        
+        JPanel panelInferior = new JPanel(); 
+        panelInferior.setLayout(new BorderLayout());
 
+        lblEstado = new JLabel("Listo para añadir tareas");
+        btnBorrarSeleccionada = new JButton("Borrar Tarea Seleccionada"); 
+        
+        panelInferior.add(lblEstado, BorderLayout.WEST);
+        panelInferior.add(btnBorrarSeleccionada, BorderLayout.EAST); 
+        
+        add(panelInferior, BorderLayout.SOUTH); 
+
+       
         JMenuBar barra = new JMenuBar();
         JMenu menuArchivo = new JMenu("Archivo");
         opcionSalir = new JMenuItem("Salir");
@@ -49,16 +63,15 @@ public class GestorTareas extends JFrame {
         setJMenuBar(barra);
 
     
+    
         btnAgregar.addActionListener(e -> agregarTarea());
         campoTarea.addActionListener(e -> agregarTarea());
+        
+       
+        btnBorrarSeleccionada.addActionListener(e -> eliminarTarea()); 
 
-        btnEliminar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                eliminarTarea();
-            }
-        });
-
+     
+        btnEliminarTodo.addActionListener(e -> eliminarTodo());
        
         listaTareas.addMouseListener(new MouseAdapter() {
             @Override
@@ -84,6 +97,17 @@ public class GestorTareas extends JFrame {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setVisible(true);
     }
+    
+   
+    
+    private void eliminarTodo() {
+        if (!modeloLista.isEmpty()) {
+            modeloLista.clear();
+            lblEstado.setText("Todas las tareas han sido eliminadas.");
+        } else {
+            lblEstado.setText("No hay tareas para eliminar.");
+        }
+    }
 
     private void agregarTarea() {
         String texto = campoTarea.getText().trim();
@@ -91,14 +115,19 @@ public class GestorTareas extends JFrame {
             modeloLista.addElement(texto);
             campoTarea.setText("");
             lblEstado.setText("Tarea añadida");
+        } else {
+            lblEstado.setText("El campo de tarea está vacío.");
         }
     }
 
     private void eliminarTarea() {
         int index = listaTareas.getSelectedIndex();
         if (index != -1) {
+            String tarea = modeloLista.getElementAt(index);
             modeloLista.remove(index);
-            lblEstado.setText("Tarea eliminada");
+            lblEstado.setText("Tarea '" + tarea + "' eliminada");
+        } else {
+            lblEstado.setText("Selecciona una tarea para eliminar.");
         }
     }
 
